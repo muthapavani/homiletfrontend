@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './addProp.css';
+import './addprop.css';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
