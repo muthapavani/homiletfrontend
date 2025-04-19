@@ -1,0 +1,817 @@
+/* Updated Dashboard CSS with improved mobile responsiveness */
+:root {
+  --primary-color: #28a745; 
+  --secondary-color: #e67e22;
+  --dark-blue: #1e293b;
+  --light-blue: #f1f5f9;
+  --white: #ffffff;
+  --gray-100: #f8fafc;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+  --button-height: 40px; /* Standard button height */
+  --sidebar-width: 280px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  background-color: var(--light-blue);
+  width: 100vw;
+}
+
+/* Sidebar styles - Updated with absolute positioning for mobile */
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--dark-blue);
+  color: var(--white);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: absolute; /* Changed from fixed to absolute */
+  border-radius: 0; /* Removed border radius */
+  right: 0;
+  top: 0;
+  height: 100vh;
+  z-index: 1001;
+  transition: transform 0.3s ease-in-out;
+  overflow-y: auto;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+}
+
+.sidebar.hidden {
+  transform: translateX(100%);
+}
+
+.sidebar.visible {
+  transform: translateX(0);
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 15px;
+}
+
+.close-sidebar {
+  background: none;
+  border: none;
+  color: var(--white);
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: var(--transition);
+}
+
+.close-sidebar:hover {
+  opacity: 1;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--gray-700);
+  margin-bottom: 24px;
+}
+
+.avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--white);
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px #00000075;
+}
+
+.user-info h3 {
+  margin: 8px 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.user-info p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gray-400);
+  font-weight: 500;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav li {
+  margin-bottom: 10px;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  text-decoration: none;
+  color: var(--gray-200);
+  border-radius: 8px;
+  transition: var(--transition);
+  height: var(--button-height);
+  line-height: var(--button-height);
+}
+
+.nav-icon {
+  margin-right: 12px;
+  font-size: 18px;
+}
+
+.sidebar-nav li.active a {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--white);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+}
+
+.sidebar-nav a:hover:not(.active) {
+  background-color: var(--gray-700);
+  transform: translateX(-4px);
+}
+
+/* Mobile-only navigation in sidebar - UPDATED to show on mobile */
+.mobile-only-nav {
+  display: none; /* Hidden by default on large screens */
+}
+
+.logout-btn, .login-btn {
+  width: 100%;
+  height: var(--button-height);
+  background: transparent;
+  color: var(--secondary-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 20px;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-btn:hover, .login-btn:hover {
+  background: linear-gradient(135deg, var(--secondary-color), #d35400);
+  color: var(--white);
+  border-color: transparent;
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  transition: var(--transition);
+  position: relative;
+}
+
+/* Dashboard header */
+.dashboard-header {
+  background-color: white;
+  padding: 16px 24px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5%;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 900;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  flex: 2;
+  gap: 10%;
+}
+
+.logo {
+  font-size: 30px;
+  font-weight: bold;
+  margin-right: 25px;
+  background: linear-gradient(90deg, #28a745, #e67e22, #e67e22, #28a745, #e67e22);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.logo:hover {
+  transform: scale(1.1);
+}
+
+/* Updated header-right to better align the button and profile */
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: 1;
+  padding-right: 10px;
+}
+
+/* Enhanced profile icon */
+.profile-icon {
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--primary-color));
+  background-size: 200% 200%;
+  animation: gradient-pulse 3s ease infinite;
+}
+
+@keyframes gradient-pulse {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.profile-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(230, 126, 34, 0.4);
+}
+
+.profile-icon .avatar {
+  width: 45px;
+  height: 45px;
+  margin-bottom: 0;
+  font-size: 18px;
+  border: 2px solid white;
+}
+
+/* Add Property Button styling - updated version */
+.add-property-button {
+  height: var(--button-height);
+  padding: 0 16px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 500;
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+}
+
+.add-property-button:hover {
+  background: linear-gradient(135deg, #219a3a, #d35400);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.add-property-button.active {
+  background: linear-gradient(135deg, #219a3a, #d35400);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.add-property-button .btn-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+/* Keep for backward compatibility but set display to none */
+.add-property-btn {
+  display: none;
+}
+
+/* Updated Search container */
+.search-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 450px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.search-container input {
+  height: var(--button-height);
+  padding: 0 16px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px 0 0 8px;
+  width: 100%;
+  outline: none;
+  font-size: 14px;
+  transition: var(--transition);
+}
+
+.search-container input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.search-container button {
+  height: var(--button-height);
+  padding: 0 20px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--white);
+  border: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 500;
+  line-height: var(--button-height);
+  white-space: nowrap;
+}
+
+.search-container button:hover {
+  background: linear-gradient(135deg, #219a3a, #d35400);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* UPDATED: Clear search button - removed background color and improved visibility */
+.clear-search-btn {
+  background: none; 
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+  font-weight: normal;
+  font-size: 12px;
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  width: 18px;
+}
+
+.clear-search-btn:hover {
+  color: var(--gray-700);
+}
+
+/* Top navigation styles - UPDATED with thinner underlines */
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 3;
+}
+
+.top-nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 600px;
+}
+
+.top-nav li {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.top-nav a {
+  text-decoration: none;
+  color: var(--gray-600);
+  font-weight: 500;
+  padding: 8px 0;
+  position: relative;
+  transition: var(--transition);
+  height: var(--button-height);
+  line-height: calc(var(--button-height) - 16px);
+  display: block;
+}
+
+.top-nav a:hover {
+  color: var(--primary-color);
+}
+
+/* UPDATED: Reduced size of navigation underlines */
+.top-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  transition: width 0.3s, left 0.3s;
+}
+
+.top-nav a:hover::after {
+  width: 50%;
+  left: 25%;
+}
+
+/* UPDATED: Active navigation item styles with thinner underline */
+.top-nav li.active a {
+  color: var(--primary-color);
+}
+
+.top-nav li.active a::after {
+  width: 50%;
+  left: 25%;
+  height: 1px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+/* UPDATED: Mobile navigation dropdown - enhanced to show all nav items */
+.mobile-nav-dropdown {
+  display: none;
+  position: relative;
+}
+
+.mobile-nav-toggle {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  color: var(--gray-600);
+  font-weight: 500;
+  padding: 8px 12px;
+  cursor: pointer;
+  line-height: calc(var(--button-height) - 16px);
+  font-size: 16px;
+}
+
+.dropdown-icon {
+  margin-left: 5px;
+  transition: transform 0.3s;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 1000;
+  top: calc(var(--button-height) + 10px);
+  left: 0;
+  padding: 8px 0;
+}
+
+.mobile-nav-dropdown.open .dropdown-content {
+  display: block;
+}
+
+.mobile-nav-dropdown.open .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+.dropdown-content a {
+  color: var(--gray-600);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: var(--transition);
+}
+
+.dropdown-content a:hover {
+  background-color: var(--gray-100);
+  color: var(--primary-color);
+}
+
+.dropdown-content a.active {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* Property Grid Layout - 4 per row */
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 20px 0;
+}
+
+/* Guest banner styling */
+.guest-banner {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.08), rgba(230, 126, 34, 0.08));
+  margin: 15px;
+  padding: 16px 24px;
+  border-radius: 8px;
+  border: 1px solid rgba(230, 126, 34, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.guest-message h3 {
+  margin: 0 0 8px 0;
+  color: var(--gray-700);
+}
+
+.guest-message p {
+  margin: 0;
+  color: var(--gray-600);
+}
+
+.guest-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.guest-actions button {
+  height: var(--button-height);
+  padding: 0 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.guest-actions .login-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--white);
+  border: none;
+}
+
+.guest-actions .register-btn {
+  background: transparent;
+  color: var(--secondary-color);
+  border: 1px solid var(--secondary-color);
+  margin-top: 20px;
+}
+
+.guest-actions .login-btn:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.guest-actions .register-btn:hover {
+  background-color: rgba(230, 126, 34, 0.1);
+}
+
+/* Guest restriction message */
+.guest-restriction {
+  margin: 40px auto;
+  text-align: center;
+  max-width: 500px;
+  padding: 30px;
+  background-color: var(--gray-100);
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+}
+
+.guest-restriction h2 {
+  color: var(--gray-700);
+  margin-bottom: 15px;
+}
+
+.guest-restriction p {
+  color: var(--gray-600);
+  margin-bottom: 20px;
+}
+
+.guest-restriction .login-btn {
+  height: var(--button-height);
+  padding: 0 24px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.guest-restriction .login-btn:hover {
+  background: linear-gradient(135deg, #219a3a, #d35400);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading state */
+.loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background-color: var(--light-blue);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--gray-200);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading p {
+  color: var(--gray-600);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Content area */
+.content-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .property-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Modified media queries for responsive behavior */
+@media (max-width: 900px) {
+  /* Show mobile-only navigation in sidebar - FIXED TO ALWAYS DISPLAY */
+  .mobile-only-nav {
+    display: block !important; /* Force display of mobile nav */
+  }
+  
+  .search-container {
+    max-width: 300px;
+  }
+  
+  .header-left {
+    flex: 1;
+  }
+  
+  .property-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .guest-actions {
+    display: flex;
+    flex-direction: column;
+  }
+  /* Hide Add Property button on smaller screens */
+  .add-property-button {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 12px 16px;
+  }
+  
+  .logo {
+    font-size: 24px;
+    margin-right: 15px;
+  }
+  
+  .search-container {
+    max-width: 200px;
+  }
+  
+  .search-container button {
+    padding: 0 15px;
+  }
+  
+  .guest-banner {
+    flex-direction: column;
+    padding: 16px;
+  }
+  
+  .guest-message {
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .guest-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .header-right {
+    gap: 8px;
+  }
+  
+  /* Hide top navigation on mobile */
+  .top-nav {
+    display: none;
+  }
+  
+  /* Remove dropdown completely */
+  .mobile-nav-dropdown {
+    display: none !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .search-container {
+    max-width: 150px;
+  }
+  
+  .search-container input {
+    padding: 0 10px;
+  }
+  
+  .search-container button {
+    padding: 0 10px;
+  }
+  
+  .property-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .header-left {
+    flex: 2;
+  }
+  
+  .header-right {
+    flex: 0;
+  }
+  
+  .profile-icon .avatar {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+}
+
+/* Fix for top navigation on large screens */
+@media (min-width: 901px) {
+  .top-nav {
+    display: flex;
+  }
+  
+  /* Hide mobile-only nav on larger screens */
+  .mobile-only-nav {
+    display: none;
+  }
+}
+
+/* ADDED: Overlay for sidebar */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.sidebar-overlay.visible {
+  display: block;
+}

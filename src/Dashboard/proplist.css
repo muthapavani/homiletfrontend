@@ -1,0 +1,322 @@
+/* src/components/Dashboard/PropertyListing.css */
+.property-listing {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    min-height: 400px;
+    border-radius: 10px
+  };
+  
+  .property-listing-header {
+    margin-bottom: 25px;
+  }
+  
+  .property-listing-header h2 {
+    margin: 0 0 20px 0;
+    color: #0f172a;
+    font-size: 22px;
+  }
+  
+  .filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-group {
+    flex: 1;
+    min-width: 150px;
+  }
+  
+  .filter-group select,
+  .filter-group input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #f8fafc;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  .filter-group select:focus,
+  .filter-group input:focus {
+    outline: none;
+    border-color: #629b0d;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  .filter-group.price-range {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .price-separator {
+    color: #64748b;
+  }
+  
+  .price-range input {
+    flex: 1;
+  }
+  
+  .properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+  }
+  
+  .property-card {
+    border-radius: 8px;
+    border:1px solid rgb(224, 217, 217);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .property-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .property-image {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .property-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .property-card:hover .property-image img {
+    transform: scale(1.05);
+  }
+  
+  .no-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f1f5f9;
+    color: #64748b;
+  }
+  
+  .property-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: #629b0d;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .property-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  .property-title {
+    margin: 0 0 10px 0;
+    font-size: 20px !important;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .property-location {
+    display: flex;
+    align-items: center;
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    color: #64748b;
+  }
+  
+  .location-icon {
+    margin-right: 5px;
+    font-style: normal;
+  }
+  
+  .property-features {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #2c476b;
+    flex-wrap: wrap;
+  }
+  
+  .feature {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #475569;
+  }
+  
+  .feature-icon {
+    margin-right: 5px;
+  }
+  
+  .property-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+  }
+  
+  .property-price {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  
+  .property-price span {
+    font-size: 14px;
+    font-weight: normal;
+    color: #64748b;
+  }
+  
+  .view-details-button {
+    padding: 8px 15px;
+    background: linear-gradient(135deg, #28a745, #e67e22);
+    color: white;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .view-details-button:hover {
+    background: linear-gradient(135deg, #0ac435, #e77a19);
+  }
+  
+  .loading-state,
+  .error-state,
+  .no-properties {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+  
+  .error-state {
+    color: #ef4444;
+  }
+  
+  .loading-spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #629b0d;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+  }
+          .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+          }
+          
+          .view-more-button {
+            background: none;
+            border: none;
+            color: #629b0d;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+          }
+          
+          .view-more-button:hover {
+            background-color: rgba(37, 99, 235, 0.1);
+          }
+          
+          .arrow-icon {
+            font-size: 1.1rem;
+            font-weight: bold;
+          }
+          .clear-filters-button{
+            border-radius: 5px;
+            border:1px solid gray;
+            margin-top: 6px;
+          }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .empty-state-icon, .error-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+  }
+  
+  .retry-button, .reset-filters-button {
+    margin-top: 15px;
+    padding: 8px 15px;
+    background-color: #629b0d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .retry-button:hover, .reset-filters-button:hover {
+    background-color:#629b0d;
+  }
+  
+  .property-section {
+    margin-bottom: 30px;
+  }
+  
+  .section-heading {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: #0f172a;
+    border-left: 3px solid #629b0d;
+    padding-left: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .properties-grid {
+      grid-template-columns: 1fr;
+    }
+      
+    .filter-container {
+      flex-direction: column;
+    }
+      
+    .filter-group {
+      width: 100%;
+    }
+  }

@@ -1,0 +1,481 @@
+/* Base styles for the container */
+.my-properties-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.my-properties-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.my-properties-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin: 0;
+}
+
+.properties-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Property Item Container */
+.property-item {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  max-height: 400px;
+  min-height: auto;
+  width: 100%;
+  flex-direction: row;
+}
+
+.property-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Image Container Styling */
+.property-image-container {
+  width: 40%;
+  min-width: 300px;
+  max-width: 500px;
+  height: auto;
+}
+
+.property-gallery {
+  position: relative;
+  background-color: #f5f5f5;
+  border-right: 1px solid #e0e0e0;
+  height: 100%;
+}
+
+.gallery-preview {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.gallery-preview:hover .preview-image {
+  transform: scale(1.03);
+}
+
+.gallery-controls {
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 8px;
+  border-radius: 20px;
+  margin: 0 auto;
+  width: fit-content;
+  z-index: 5;
+}
+
+.gallery-nav {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+.image-counter {
+  color: white;
+  margin: 0 10px;
+  font-size: 14px;
+}
+
+/* No images placeholder */
+.no-images {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+}
+
+.no-images-text {
+  color: #757575;
+  font-style: italic;
+}
+
+/* Content Container */
+.property-content-container {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+/* Property Header */
+.property-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.property-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: rgb(243, 99, 42);
+  margin: 0;
+  flex-grow: 1;
+}
+
+.property-badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  text-transform: capitalize;
+}
+
+.property-badge.active {
+  background-color: #2e7d32;
+}
+
+.property-badge.pending {
+  background-color: #f57c00;
+}
+
+.property-badge.sold {
+  background-color: #d32f2f;
+}
+
+.property-badge.rented {
+  background-color: #1976d2;
+}
+
+.property-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-property-button, .delete-property-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.edit-property-button {
+  background-color: #2e7d32;
+  color: white;
+}
+
+.edit-property-button:hover {
+  background-color: #1b5e20;
+  transform: scale(1.02);
+}
+
+.delete-property-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-property-button:hover {
+  background-color: #d32f2f;
+  transform: scale(1.02);
+}
+
+/* Tabs Styling */
+.property-tabs {
+  padding: 16px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs-header {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+/* Tab Buttons */
+.tab-button {
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #616161;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  color: #2e7d32;
+}
+
+.tab-button.active {
+  color: #2e7d32;
+  border-bottom-color: #2e7d32;
+}
+
+/* Tab Content */
+.tab-content {
+  flex-grow: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* New styles for scrollable tab content - consistent across all tabs */
+.scrollable-tab-content {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: 10px; /* Add some padding for the scrollbar */
+  max-height: 250px; /* Limit height to enable scrolling */
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Scrollbar styling for webkit browsers */
+.scrollable-tab-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-tab-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.scrollable-tab-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.scrollable-tab-content::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Detail Sections */
+.detail-section {
+  margin-bottom: 20px;
+}
+
+.detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+/* Property Info Grid */
+.property-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 12px;
+  color: #757575;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Location styling */
+.location-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.address-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.icon {
+  color: #2e7d32;
+  font-size: 16px;
+}
+
+.coordinates-section {
+  margin-top: 8px;
+}
+
+.map-link-container {
+  margin-top: 10px;
+}
+
+.view-on-map-button {
+  display: inline-block;
+  background-color: #2e7d32;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.view-on-map-button:hover {
+  background-color: #1b5e20;
+}
+
+/* Amenities styling */
+.amenities-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.amenity-tag {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Fullscreen carousel overlay */
+.fullscreen-carousel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.close-carousel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.carousel-container {
+  display: flex;
+  align-items: center;
+  width: 90%;
+  max-width: 1200px;
+}
+
+.carousel-image-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-image {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.carousel-nav {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 24px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin: 0 20px;
+}
+
+.carousel-counter {
+  color: white;
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .property-item {
+    flex-direction: column;
+    max-height: none;
+  }
+  
+  .property-image-container {
+    width: 100%;
+    max-width: none;
+  }
+  
+  .property-content-container {
+    width: 100%;
+  }
+  
+  .property-info-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}

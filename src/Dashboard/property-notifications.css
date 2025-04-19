@@ -1,0 +1,247 @@
+.property-notifications {
+  width: 100%;
+  padding: 10px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.notifications-heading {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.notifications-loading, 
+.notifications-error, 
+.notifications-empty {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+
+.notifications-error {
+  color: #d32f2f;
+  background-color: #ffebee;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 600px;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding-right: 5px; /* Add some padding to account for the hidden scrollbar */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.notifications-list::-webkit-scrollbar {
+  display: none;
+}
+
+.notification-card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.notification-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-name {
+  margin: 0 0 3px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.notification-date {
+  font-size: 0.8rem;
+  color: #757575;
+}
+
+.notification-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.pending {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.status-badge.resolved {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.unread-badge {
+  padding: 2px 8px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-left: 10px;
+}
+
+.notification-body {
+  margin-bottom: 15px;
+}
+
+.contact-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.contact-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-label {
+  font-size: 0.75rem;
+  color: #757575;
+  margin-bottom: 2px;
+}
+
+.contact-value {
+  font-size: 0.9rem;
+  color: #424242;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.contact-value:hover {
+  text-decoration: underline;
+  color: #1976d2;
+}
+
+.contact-unavailable {
+  color: #9e9e9e;
+  font-style: italic;
+}
+
+.message-container {
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.message-label {
+  margin: 0 0 5px 0;
+  font-size: 0.8rem;
+  color: #616161;
+  font-weight: 500;
+}
+
+.message-content {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  white-space: pre-line;
+  color: #333;
+}
+
+.notification-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.action-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.action-button.respond {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.action-button.respond:hover {
+  background-color: #bbdefb;
+}
+
+.action-button.call {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.action-button.call:hover {
+  background-color: #c8e6c9;
+}
+
+.action-button.mark-resolved {
+  background-color: #f5f5f5;
+  color: #616161;
+}
+
+.action-button.mark-resolved:hover {
+  background-color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .contact-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .notification-actions {
+    flex-direction: column;
+  }
+  
+  .action-button {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+}
+
+/* Animations for list items */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notification-card {
+  animation: fadeIn 0.3s ease-out;
+}

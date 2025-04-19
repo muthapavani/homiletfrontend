@@ -1,0 +1,274 @@
+.hero-section {
+  background-image: url("../../assets/landingimg/homeImage.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 0;
+}
+
+.custom-navbar {
+  position: relative;
+  z-index: 10;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  width: 70px;
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.nav-logo:hover {
+  transform: scale(1.07);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navbar-nav .nav-link {
+  font-size: 20px;
+  font-weight: 500;
+  color: white !important;
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 5px;
+  transition: color 0.3s ease-in-out;
+}
+
+.navbar-nav .nav-link::after {
+  content: "";
+  display: block;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, #d35400, #27ae60);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: width 0.3s ease-in-out;
+}
+
+.navbar-nav .nav-link:hover::after {
+  width: 100%;
+}
+
+.custom-btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white !important;
+  background: linear-gradient(90deg, #d35400, #27ae60);
+  border-radius: 30px !important;
+  border: none;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.custom-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+  opacity: 0.9;
+}
+
+.banner-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+.banner-content h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.banner-content .p {
+  font-size: 25px;
+  margin: 10px 0;
+  color: aliceblue;
+}
+
+.head {
+  color: #05ee66;
+  font-size: 50px;
+  text-shadow: 2px 2px #3de683;
+}
+
+.banner-content h1 p {
+  font-size: 20px;
+  color: #f08239;
+}
+
+.banner-content button {
+  padding: 10px 20px;
+  margin-top: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(90deg, #d35400, #27ae60);
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+
+.banner-content button:hover {
+  transform: scale(1.05);
+}
+
+/* Mobile navbar styles */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    position: fixed;
+    top: 0;
+    right: 0; /* Changed from left to right */
+    bottom: 0;
+    z-index: 9;
+    height: 100vh;
+    width: 80%; /* Set width for the sidebar */
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.95);
+    padding: 80px 20px 20px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(100%); /* Changed from -100% to 100% to slide from right */
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .navbar-collapse.show {
+    transform: translateX(0);
+  }
+  
+  .navbar-toggler {
+    position: relative;
+    z-index: 11;
+  }
+  
+  .navbar-nav {
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .navbar-nav .nav-item {
+    margin: 10px 0;
+  }
+  
+  .navbar-nav .nav-link {
+    font-size: 24px;
+    padding: 10px 0;
+  }
+  
+  .d-flex {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .d-flex .custom-btn {
+    width: 100%;
+    margin: 5px 0;
+    text-align: center;
+  }
+  
+  /* Navbar close button */
+  .navbar-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 12;
+  }
+  
+  .btn-close {
+    background-color: transparent;
+    color: white;
+    font-size: 1.5rem;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+  
+  .btn-close:hover {
+    opacity: 1;
+  }
+  
+  /* Custom X mark styling */
+  .btn-close {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    background: none;
+  }
+  
+  .btn-close::before,
+  .btn-close::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+  }
+  
+  .btn-close::before {
+    transform: rotate(45deg);
+  }
+  
+  .btn-close::after {
+    transform: rotate(-45deg);
+  }
+  
+  /* When menu is open, add overlay */
+  body.offcanvas-open::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 8;
+  }
+}
+
+/* For larger screens - keep the navbar inline */
+@media (min-width: 992px) {
+  .navbar-close-btn {
+    display: none;
+  }
+}
