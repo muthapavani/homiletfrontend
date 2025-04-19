@@ -18,7 +18,7 @@ function ForgotPassword() {
     setError("");
 
     axios
-      .post("http://localhost:5000/forgot-password", { email })
+      .post("https://homilet-backend-2.onrender.com/forgot-password", { email })
       .then((res) => {
         setMessage(res.data.message);
         setStep(2); // Move to OTP verification step
@@ -33,7 +33,7 @@ function ForgotPassword() {
     setError("");
 
     axios
-      .post("http://localhost:5000/verify-otp", { email, otp })
+      .post("https://homilet-backend-2.onrender.com/verify-otp", { email, otp })
       .then(() => {
         navigate("/reset-password", { state: { email } }); // Redirect with email state
       })

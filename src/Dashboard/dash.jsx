@@ -181,7 +181,7 @@ const Dashboard = () => {
         }
 
         // Try to fetch user data with token
-        const response = await axios.get("http://localhost:5000/api/user", {
+        const response = await axios.get("https://homilet-backend-2.onrender.com/api/user", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -314,7 +314,7 @@ const Dashboard = () => {
       setSearchController(controller);
       
       // Debug the actual URL being called
-      const apiUrl = `http://localhost:5000/api/properties/search?${queryParams.toString()}`;
+      const apiUrl = `https://homilet-backend-2.onrender.com/api/properties/search?${queryParams.toString()}`;
       
       const response = await axios.get(
         apiUrl,

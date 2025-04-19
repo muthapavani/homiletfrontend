@@ -4,7 +4,7 @@ import './proplist.css';
 
 const PropertyListing = ({ userData, searchQuery, category, searchActive = false, searchResults = null, noResultsFound = false }) => {
   // Define the API base URL for image paths
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "https://homilet-backend-2.onrender.com";
   const navigate = useNavigate();
   
   const [properties, setProperties] = useState([]);

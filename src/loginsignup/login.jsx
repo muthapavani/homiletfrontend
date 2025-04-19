@@ -22,7 +22,7 @@ function Login() {
     const checkServerStatus = async () => {
       try {
         // Options request to login endpoint
-        await axios.options("http://localhost:5000/login");
+        await axios.options("https://homilet-backend-2.onrender.com/login");
         setServerStatus("online");
       } catch (err) {
         if (err.response) {
@@ -72,7 +72,7 @@ function Login() {
 
       try {
         // Use the original endpoint that was working
-        const res = await axios.post("http://localhost:5000/login", values);
+        const res = await axios.post("https://homilet-backend-2.onrender.com/login", values);
         console.log("Login API Response:", res.data);
 
         if (res.data.token) {
@@ -116,7 +116,7 @@ const handleGuestLogin = async () => {
 
   try {
     // Call the server endpoint instead of creating a local guest
-    const res = await axios.post("http://localhost:5000/api/guest-login");
+    const res = await axios.post("https://homilet-backend-2.onrender.com/api/guest-login");
     
     if (res.data.success && res.data.token) {
       console.log("Guest login successful!");

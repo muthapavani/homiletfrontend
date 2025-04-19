@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './contact-agent.css';
 
 // Environment configuration with fallback
-const API_URL =  'http://localhost:5000';
+const API_URL =  'https://homilet-backend-2.onrender.com';
 
 const ContactAgentModal = ({ propertyDetails }) => {
   // State management

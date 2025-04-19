@@ -24,7 +24,7 @@ const PropertyNotifications = ({ userId, propertyId }) => {
       
       console.log(`Fetching notifications for property: ${propertyId}, user: ${userId}`);
       
-      const response = await fetch(`http://localhost:5000/api/notifications/property/${propertyId}`, {
+      const response = await fetch(`https://homilet-backend-2.onrender.com/api/notifications/property/${propertyId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -93,7 +93,7 @@ const PropertyNotifications = ({ userId, propertyId }) => {
     try {
       const token = localStorage.getItem('token');
       
-      await fetch('http://localhost:5000/api/notifications/mark-read', {
+      await fetch('https://homilet-backend-2.onrender.com/api/notifications/mark-read', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -265,7 +265,7 @@ const PropertyNotifications = ({ userId, propertyId }) => {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:5000/api/notifications/status/${notificationId}`, {
+      const response = await fetch(`https://homilet-backend-2.onrender.com/api/notifications/status/${notificationId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

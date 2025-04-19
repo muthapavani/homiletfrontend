@@ -45,7 +45,7 @@ class ProfileSection extends React.Component {
       const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
       console.log("Authorization header:", authHeader);
       
-      const response = await fetch('http://localhost:5000/api/user', {
+      const response = await fetch('https://homilet-backend-2.onrender.com/api/user', {
         method: 'GET',
         headers: {
           'Authorization': authHeader,
@@ -133,7 +133,7 @@ class ProfileSection extends React.Component {
       // Ensure token is correctly formatted
       const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
       
-      const response = await fetch('http://localhost:5000/api/user/profile', {
+      const response = await fetch('https://homilet-backend-2.onrender.com/api/user/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

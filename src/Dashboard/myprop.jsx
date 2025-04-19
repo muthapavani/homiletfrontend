@@ -9,7 +9,7 @@ const getImageUrl = (imagePath) => {
     if (imagePath.startsWith('http')) {
       return imagePath;
     } else {
-      return `http://localhost:5000${imagePath}`;
+      return `https://homilet-backend-2.onrender.com${imagePath}`;
     }
   }
 // Return a placeholder if image path is invalid
@@ -371,7 +371,7 @@ const MyProperties = ({ userData }) => {
         return;
       }
       
-      const requestUrl = 'http://localhost:5000/api/properties/user';
+      const requestUrl = 'https://homilet-backend-2.onrender.com/api/properties/user';
       
       console.log(`Making request to: ${requestUrl}`);
       
@@ -506,7 +506,7 @@ const MyProperties = ({ userData }) => {
           return;
         }
         
-        const requestUrl = `http://localhost:5000/api/properties/${propertyId}`;
+        const requestUrl = `https://homilet-backend-2.onrender.com/api/properties/${propertyId}`;
         
         const response = await fetch(requestUrl, {
           method: 'DELETE',
@@ -546,7 +546,7 @@ const MyProperties = ({ userData }) => {
       const token = localStorage.getItem('token');
       if (!token) return;
       
-      const response = await fetch(`http://localhost:5000/api/properties/${propertyId}`, {
+      const response = await fetch(`https://homilet-backend-2.onrender.com/api/properties/${propertyId}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

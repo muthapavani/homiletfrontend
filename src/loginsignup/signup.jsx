@@ -45,7 +45,7 @@ function Signup() {
       setServerError("");
 
       try {
-        const response = await axios.post("http://localhost:5000/signup", values);
+        const response = await axios.post("https://homilet-backend-2.onrender.com/signup", values);
         alert(response.data.message);
         navigate("/login");
       } catch (err) {

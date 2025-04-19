@@ -487,7 +487,7 @@ const AddProperty = ({ userData }) => {
       }
       
       // Use the environment variable for API URL if available, otherwise use a default
-      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_BASE_URL = 'https://homilet-backend-2.onrender.com';
       const apiUrl = `${API_BASE_URL}/api/properties`;
       
       const response = await fetch(apiUrl, {

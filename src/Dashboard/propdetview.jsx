@@ -184,7 +184,7 @@ const PropertyDetailsView = () => {
   const navigate = useNavigate();
   
   // Define the API base URL for image paths, matching proplist.jsx
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "https://homilet-backend-2.onrender.com";
   
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
