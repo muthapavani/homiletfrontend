@@ -10,7 +10,7 @@ const PaymentHistory = () => {
   const [retryCount, setRetryCount] = useState(0);
   
   // API URL and token
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "https://homilet-backend-2.onrender.com";
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   
   // Identify if we're in development mode
