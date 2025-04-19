@@ -15,7 +15,7 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
   
   // Configuration
   const token = localStorage.getItem('token');
-  const API_BASE_URL = "http://localhost:5000";
+  const API_BASE_URL = "https://homilet-backend-2.onrender.com";
   
   // Development mode detection
   const isDevelopment = () => {
