@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Property-notifications.css'; // You'll need to create this CSS file
+import './property-notifications.css'; // You'll need to create this CSS file
 
 const PropertyNotifications = ({ userId, propertyId }) => {
   const [notifications, setNotifications] = useState([]);
