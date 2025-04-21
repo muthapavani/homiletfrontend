@@ -76,6 +76,7 @@ const PaymentHistory = () => {
       };
       
       if (isDevelopment()) {
+        console.log('Fetching payment history with token:', token ? 'Token exists' : 'No token');
         console.log('Request headers:', headers);
       }
     
@@ -130,6 +131,7 @@ const PaymentHistory = () => {
         // Specific error handling based on status code
         if (response.status === 401 || response.status === 403) {
           throw new Error("Session expired. Please log in again.");
+          
         } else if (response.status === 500) {
           // For 500 errors, provide more diagnostic information
           const dbTest = await testDatabaseConnection();

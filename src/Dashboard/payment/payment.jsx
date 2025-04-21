@@ -33,19 +33,28 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
       }
       
       try {
+        console.log("Checking payment status for property:", propertyId);
+        console.log("Token status:", token ? "Token exists" : "No token");
+        
         const response = await fetch(
           `${API_BASE_URL}/api/payments/check-status?propertyId=${propertyId}`, 
           {
-            headers: { 'Authorization': `Bearer ${token}` },
+            headers: { 
+              'Authorization': `Bearer ${token.trim()}`,
+              'Accept': 'application/json'
+            },
             credentials: 'include'
           }
         );
+        
+        console.log("Status check response:", response.status);
         
         if (!response.ok) {
           throw new Error(`Status check failed: ${response.status}`);
         }
         
         const data = await response.json();
+        console.log("Payment status data:", data);
         
         if (data.success) {
           setPaymentStatus({
@@ -90,8 +99,9 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
         response = await fetch(`${API_BASE_URL}/api/payments/history`, {
           method: 'GET',
           headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json'
+            'Authorization': `Bearer ${token.trim()}`,
+            'Accept': 'application/json',
+            'Origin': window.location.origin
           },
           credentials: 'include'
         });
@@ -270,8 +280,6 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
       };
     }
     
-    // Removed the upper limit check!
-    
     return {
       valid: true,
       value: parsedPrice
@@ -294,7 +302,7 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
     });
   };
 
-  // Handle payment - FIXED for high payment amounts
+  // Updated handlePayment function to use existing endpoints
   const handlePayment = async () => {
     if (!isLoggedIn) {
       onLoginRedirect();
@@ -320,20 +328,24 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
       const validatedPrice = priceValidation.value;
       
       // Log payment attempt for debugging
-      if (isDevelopment()) {
-        console.log(`Payment attempt: ₹${validatedPrice} for property ID ${propertyId}`);
-      }
+      console.log(`Payment attempt: ₹${validatedPrice} for property ID ${propertyId}`);
+      console.log("Token status:", token ? "Token exists" : "No token");
       
       const scriptLoaded = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
       if (!scriptLoaded) {
         throw new Error('Failed to load payment gateway.');
       }
       
+      console.log("Creating payment order...");
+      
+      // Use the existing endpoint instead of the public one
       const response = await fetch(`${API_BASE_URL}/api/payments/create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token.trim()}`,
+          'Accept': 'application/json',
+          'Origin': window.location.origin
         },
         credentials: 'include',
         body: JSON.stringify({ 
@@ -344,43 +356,65 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
         })
       });
       
-      // Enhanced error handling for server responses
+      console.log("Response status:", response.status);
+      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
+      
+      // Get response data
       let data;
       try {
         data = await response.json();
+        console.log("Response data:", data);
       } catch (parseError) {
         console.error("JSON parse error:", parseError);
         throw new Error("Invalid response format from server");
       }
 
+      // Handle error responses
       if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
+        // Handle 401 authentication errors - these require logout
+        if (response.status === 401) {
+          console.error("Authentication error - logging out");
           localStorage.removeItem('token');
           onLoginRedirect();
           throw new Error(`Your session has expired. Please log in again.`);
         }
         
-        throw new Error(data.message || 'Unable to process payment.');
+        // For all other errors
+        throw new Error(data.message || "Payment processing failed. Please try again.");
       }
-      
-      if (!data.success) {
-        throw new Error(data.message || 'Could not create payment order');
+
+      // Check for valid order data
+      if (!data.success || !data.order || !data.order.id) {
+        throw new Error(data.message || "Failed to create payment order");
       }
-      
+
+      const orderDetails = data.order;
+      const keyId = data.keyId || data.key_id || "rzp_test_jb2DnMBdQxe1KO";
+
       const options = {
-        key: data.keyId || data.key_id || "rzp_test_jb2DnMBdQxe1KO",
-        amount: data.order.amount,
-        currency: data.order.currency,
+        key: keyId,
+        amount: orderDetails.amount,
+        currency: orderDetails.currency || 'INR',
         name: 'Real Estate Portal',
         description: `Payment for ${propertyTitle}`,
-        order_id: data.order.id,
+        order_id: orderDetails.id,
         handler: async function(response) {
           try {
+            console.log("Payment completed, verifying...");
+            console.log("Verification payload:", {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature ? "Signature exists" : "No signature"
+            });
+            
+            // Use the existing verification endpoint instead of the public one
             const verifyResponse = await fetch(`${API_BASE_URL}/api/payments/verify-payment`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token.trim()}`,
+                'Accept': 'application/json',
+                'Origin': window.location.origin
               },
               credentials: 'include',
               body: JSON.stringify({
@@ -391,18 +425,31 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
               })
             });
             
-            const verifyData = await verifyResponse.json();
+            console.log("Verify response status:", verifyResponse.status);
             
+            let verifyData;
+            try {
+              verifyData = await verifyResponse.json();
+              console.log("Verify response data:", verifyData);
+            } catch (e) {
+              console.error("Failed to parse verification response:", e);
+              throw new Error("Invalid verification response");
+            }
+            
+            // Handle verification response
             if (!verifyResponse.ok) {
-              if (verifyResponse.status === 401 || verifyResponse.status === 403) {
+              // Only consider 401 as authentication error
+              if (verifyResponse.status === 401) {
                 localStorage.removeItem('token');
                 onLoginRedirect();
                 throw new Error('Session expired during payment verification');
               }
               
+              // For other errors
               throw new Error(`Payment verification failed: ${verifyData.message || 'Please try again.'}`);
             }
             
+            // Normal success flow
             if (verifyData.success) {
               setPaymentStatus({
                 status: 'paid',
@@ -410,7 +457,7 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
                   orderId: response.razorpay_order_id,
                   paymentId: response.razorpay_payment_id,
                   amount: validatedPrice,
-                  currency: data.order.currency,
+                  currency: orderDetails.currency || 'INR',
                   date: new Date().toISOString(),
                   expiresIn: 30
                 }
@@ -426,6 +473,7 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
               setError('Payment verification failed: ' + verifyData.message);
             }
           } catch (error) {
+            console.error("Verification error:", error);
             setError(error.message);
           }
         },
@@ -437,40 +485,60 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
         theme: { color: '#3399cc' },
         modal: {
           ondismiss: function() {
+            console.log("Payment modal dismissed");
             setLoading(false);
           }
         }
       };
       
+      console.log("Opening Razorpay with options:", {
+        key: options.key,
+        amount: options.amount,
+        currency: options.currency,
+        name: options.name,
+        order_id: options.order_id
+      });
+      
       const razorpay = new window.Razorpay(options);
       razorpay.open();
       
     } catch (error) {
+      console.error("Payment error details:", error);
+      
+      // Show clear error message
       setError(error.message || 'Payment initiation failed');
     } finally {
       setLoading(false);
     }
   };
 
-  // Render payment button based on status
+  // Is the property sold?
+  const isPropertySold = () => {
+    return paymentStatus.status === 'paid';
+  };
+
+  // Render payment button or sold out badge based on status
   const renderPaymentButton = () => {
+    // If the property is sold (payment completed), show SOLD OUT badge
+    if (isPropertySold()) {
+      return (
+        <div className="sold-out-container">
+          <div className="sold-out-badge">SOLD OUT</div>
+          <div className="payment-info">
+            <span>Payment Completed on {formatDate(paymentStatus.details?.date)}</span>
+            {paymentStatus.details?.expiresIn && (
+              <small className="expiry-notice"> (Valid for {paymentStatus.details.expiresIn} days)</small>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    // Otherwise, show the appropriate payment button based on status
     if (paymentStatus.status === 'checking') {
       return (
         <button className="payment-button loading" disabled={true}>
           <span className="loading-indicator">Checking status...</span>
-        </button>
-      );
-    }
-    
-    if (paymentStatus.status === 'paid') {
-      return (
-        <button className="payment-button completed" disabled={true}>
-          <span>
-            Payment Completed
-            {paymentStatus.details?.expiresIn && (
-              <small className="expiry-notice"> (Valid for {paymentStatus.details.expiresIn} days)</small>
-            )}
-          </span>
         </button>
       );
     }
@@ -558,6 +626,9 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
                       {payment.property_address && (
                         <div className="property-address">{payment.property_address}</div>
                       )}
+                      {payment.property_id === propertyId && isValidPayment(payment.created_at) && (
+                        <div className="property-sold-tag">SOLD</div>
+                      )}
                     </td>
                     <td className="amount">
                       {payment.currency || 'INR'} {parseFloat(payment.amount || 0).toLocaleString()}
@@ -590,7 +661,7 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
   };
 
   return (
-    <div className="payment-button-container">      
+    <div className={`payment-button-container ${isPropertySold() ? 'property-sold' : ''}`}>      
       {renderPaymentButton()}
       
       {error && (

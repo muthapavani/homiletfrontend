@@ -331,6 +331,7 @@
   font-weight: bold;
 }
 
+
 /* Responsive adjustments */
 @media screen and (max-width: 600px) {
   .payment-button-container {
