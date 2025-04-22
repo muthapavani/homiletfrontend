@@ -73,12 +73,13 @@ function Login() {
       try {
         // Use the original endpoint that was working
         const res = await axios.post("https://homilet-backend-2.onrender.com/login", values);
-        console.log("Login API Response:", res.data);
+        console.log("Login API Response:", res.data,res.data.user.id);
 
         if (res.data.token) {
           console.log("Login successful!");
           // Store token without "Bearer " prefix
           localStorage.setItem('token', res.data.token);
+          localStorage.setItem('id', res.data.user.id);
           
           // Store user data
           if (res.data.user) {

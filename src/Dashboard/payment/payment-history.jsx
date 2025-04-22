@@ -1,4 +1,3 @@
-// PaymentHistory.jsx - Improved component with comprehensive error handling and retry logic
 import React, { useState, useEffect } from 'react';
 import './payment-history.css';
 
@@ -6,52 +5,18 @@ const PaymentHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [history, setHistory] = useState([]);
-  const [debugInfo, setDebugInfo] = useState(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
   
   // API URL and token
   const API_BASE_URL = "https://homilet-backend-2.onrender.com";
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   
-  // Identify if we're in development mode
-  const isDevelopment = () => {
-    return process.env.NODE_ENV === 'development' || 
-           window.location.hostname === 'localhost' || 
-           window.location.hostname === '127.0.0.1';
-  };
-  
   useEffect(() => {
-    // Call the function to fetch data
     fetchPaymentHistory();
-  }, [token, retryCount]);
+  }, [token]);
   
-  // Test database connection
-  const testDatabaseConnection = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/payments/test-db`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        },
-        credentials: 'include'
-      });
-      
-      const data = await response.json();
-      return {
-        success: response.ok,
-        message: data.message || 'Test completed',
-        data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-        error
-      };
-    }
-  };
-  
-  // Fetch payment history with better error handling
+  // Fetch payment history from the backend
   const fetchPaymentHistory = async () => {
     if (!token) {
       setError("Please log in to view payment history");
@@ -63,156 +28,69 @@ const PaymentHistory = () => {
     setError(null);
     
     try {
-      // Debug logging in development
-      if (isDevelopment()) {
-        console.log('Fetching payment history with token:', token ? 'Token exists' : 'No token');
-        console.log('Request URL:', `${API_BASE_URL}/api/payments/history`);
-      }
+      const response = await fetch(`${API_BASE_URL}/api/payments/history`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token.trim()}`,
+          'Accept': 'application/json'
+        },
+        credentials: 'include'
+      });
       
-      // Create headers object with authentication token
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      };
-      
-      if (isDevelopment()) {
-        console.log('Fetching payment history with token:', token ? 'Token exists' : 'No token');
-        console.log('Request headers:', headers);
-      }
-    
-      // Make API request with comprehensive error handling
-      let response;
-      try {
-        response = await fetch(`${API_BASE_URL}/api/payments/history`, {
-          method: 'GET',
-          headers,
-          credentials: 'include',
-          mode: 'cors'
-        });
-      } catch (fetchError) {
-        console.error("Network-level fetch error:", fetchError);
-        
-        // Test if the server is running at all
-        try {
-          await fetch(`${API_BASE_URL}/api/test`);
-          throw new Error(`Network error while connecting to server: ${fetchError.message}`);
-        } catch (testError) {
-          throw new Error(`Server appears to be offline. Please check if the backend server is running.`);
-        }
-      }
-      
-      // Handle HTTP errors
       if (!response.ok) {
-        let errorData = null;
-        let errorText = '';
-        
-        // Try to parse error response as JSON
-        try {
-          errorData = await response.json();
-          errorText = errorData.message || errorData.error || `HTTP ${response.status}`;
-          
-          if (isDevelopment()) {
-            console.error('Error response from server:', errorData);
-            setDebugInfo(JSON.stringify(errorData, null, 2));
-          }
-        } catch (jsonError) {
-          // Fallback to plain text if not JSON
-          try {
-            errorText = await response.text();
-            if (isDevelopment()) {
-              console.error('Error response (text):', errorText);
-              setDebugInfo(errorText);
-            }
-          } catch (textError) {
-            errorText = `${response.status}: ${response.statusText}`;
-          }
-        }
-        
-        // Specific error handling based on status code
         if (response.status === 401 || response.status === 403) {
           throw new Error("Session expired. Please log in again.");
-          
-        } else if (response.status === 500) {
-          // For 500 errors, provide more diagnostic information
-          const dbTest = await testDatabaseConnection();
-          if (!dbTest.success) {
-            throw new Error(`Database connection error: ${dbTest.message}. Please check your database configuration.`);
-          } else {
-            throw new Error(`Server error (500): ${errorText}. Database appears to be working.`);
-          }
         } else {
-          throw new Error(`Server error: ${errorText}`);
+          throw new Error(`Server error (${response.status}). Please try again later.`);
         }
       }
       
-      // Parse response data
-      let data;
-      try {
-        data = await response.json();
-        
-        if (isDevelopment()) {
-          console.log('Payment history response:', data);
-        }
-      } catch (parseError) {
-        console.error("JSON parse error:", parseError);
+      const data = await response.json();
+      
+      if (!data.success || !data.history) {
         throw new Error("Invalid response format from server");
       }
       
-      // Validate response structure
-      if (!data || typeof data !== 'object') {
-        throw new Error("Invalid data format received from server");
-      }
-      
-      // Check for API success flag and history array
-      if (data.success === false) {
-        throw new Error(data.message || "API returned error");
-      }
-      
-      if (!Array.isArray(data.history)) {
-        throw new Error("Invalid history data format");
-      }
-      
-      // Set history data
-      setHistory(data.history);
-      
-      // If no data was found, show appropriate message
       if (data.history.length === 0) {
-        setError("No payment records found in database");
+        setError("No payment records found");
+      } else {
+        // Sort and set the payment history
+        sortPaymentsData(data.history, sortBy, sortOrder);
       }
     } catch (error) {
       console.error('Error fetching payment history:', error);
       setError(error.message || "Failed to load payment history");
-      
-      if (isDevelopment()) {
-        console.log('Using development mock data since an error occurred');
-        setHistory([
-          {
-            id: 'mock-1',
-            payment_id: 'pay_dev_123456',
-            property_id: '1',
-            property_title: 'Development Property',
-            amount: 5000,
-            currency: 'INR',
-            created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-            status: 'success'
-          },
-          {
-            id: 'mock-2',
-            payment_id: 'pay_dev_789012',
-            property_id: '2',
-            property_title: 'Another Development Property',
-            amount: 7500,
-            currency: 'INR',
-            created_at: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
-            status: 'success'
-          }
-        ]);
-        
-        setError("⚠️ Using mock data - actual database connection failed");
-      }
     } finally {
       setLoading(false);
     }
+  };
+  
+  // Sort payments data
+  const sortPaymentsData = (data, field, order) => {
+    const sortedData = [...data].sort((a, b) => {
+      if (field === 'date') {
+        const dateA = new Date(a.created_at);
+        const dateB = new Date(b.created_at);
+        return order === 'asc' ? dateA - dateB : dateB - dateA;
+      } else if (field === 'amount') {
+        return order === 'asc' ? a.amount - b.amount : b.amount - a.amount;
+      } else if (field === 'property') {
+        const propA = (a.property_title || '').toLowerCase();
+        const propB = (b.property_title || '').toLowerCase();
+        return order === 'asc' ? propA.localeCompare(propB) : propB.localeCompare(propA);
+      }
+      return 0;
+    });
+    
+    setHistory(sortedData);
+  };
+  
+  // Update sort order and re-sort data
+  const handleSort = (field) => {
+    const newOrder = field === sortBy && sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortBy(field);
+    setSortOrder(newOrder);
+    sortPaymentsData(history, field, newOrder);
   };
   
   // Format date in a readable format
@@ -229,7 +107,6 @@ const PaymentHistory = () => {
         minute: '2-digit'
       });
     } catch (e) {
-      console.error('Date formatting error:', e);
       return dateString || 'N/A';
     }
   };
@@ -249,48 +126,37 @@ const PaymentHistory = () => {
       
       return diffDays > 0 ? diffDays : 0;
     } catch (e) {
-      console.error('Days calculation error:', e);
       return 0;
     }
   };
   
-  // Helper function to determine if payment is valid or expired
+  // Check if a payment is still valid
   const isValidPayment = (dateString) => {
     return calculateDaysLeft(dateString) > 0;
   };
   
   // Handle retry button click
   const handleRetry = () => {
-    setError(null);
-    setRetryCount(prevCount => prevCount + 1);
+    fetchPaymentHistory();
   };
   
-  // Run database setup if needed
-  const runDatabaseSetup = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/setup-database`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        alert('Database setup completed. Retrying fetch...');
-        handleRetry();
-      } else {
-        alert(`Setup failed: ${data.message}`);
-      }
-    } catch (error) {
-      alert(`Could not run setup: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
+  // Render the sort header
+  const renderSortHeader = (label, field) => {
+    const isActive = sortBy === field;
+    
+    return (
+      <th 
+        className={`sortable-header ${isActive ? 'active-sort' : ''}`}
+        onClick={() => handleSort(field)}
+      >
+        {label}
+        {isActive && (
+          <span className="sort-indicator">
+            {sortOrder === 'asc' ? ' ▲' : ' ▼'}
+          </span>
+        )}
+      </th>
+    );
   };
 
   return (
@@ -305,38 +171,11 @@ const PaymentHistory = () => {
       )}
       
       {error && (
-        <div className={`error-message ${error.includes('mock data') ? 'warning' : ''}`}>
-          <p><strong>{error.includes('mock data') ? 'Warning:' : 'Error:'}</strong> {error}</p>
-          <div className="error-actions">
-            <button onClick={handleRetry} className="retry-button">
-              Retry
-            </button>
-            
-            {error.includes('database') && isDevelopment() && (
-              <button onClick={runDatabaseSetup} className="setup-button">
-                Run Database Setup
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-      
-      {/* Enhanced debug section with additional tools */}
-      {isDevelopment() && (debugInfo || error) && (
-        <div className="debug-info">
-          <h4>Debug Information</h4>
-          {debugInfo && <pre>{debugInfo}</pre>}
-          <div className="debug-tools">
-            <button onClick={async () => {
-              const result = await testDatabaseConnection();
-              setDebugInfo(JSON.stringify(result, null, 2));
-            }} className="test-button">
-              Test Database Connection
-            </button>
-            <button onClick={() => setDebugInfo(null)} className="clear-button">
-              Clear Debug Info
-            </button>
-          </div>
+        <div className="error-message">
+          <p><strong>Note:</strong> {error}</p>
+          <button onClick={handleRetry} className="retry-button">
+            Retry
+          </button>
         </div>
       )}
       
@@ -351,9 +190,9 @@ const PaymentHistory = () => {
           <table className="payment-table">
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Property</th>
-                <th>Amount</th>
+                {renderSortHeader('Date', 'date')}
+                {renderSortHeader('Property', 'property')}
+                {renderSortHeader('Amount', 'amount')}
                 <th>Status</th>
                 <th>Payment ID</th>
               </tr>
@@ -364,17 +203,17 @@ const PaymentHistory = () => {
                   key={payment.id || payment.payment_id || Math.random().toString(36)} 
                   className={isValidPayment(payment.created_at) ? 'valid' : 'expired'}
                 >
-                  <td>{formatDate(payment.created_at)}</td>
-                  <td>
-                    {payment.property_title || `Property #${payment.property_id || 'Unknown'}`}
+                  <td className="date-cell">{formatDate(payment.created_at)}</td>
+                  <td className="property-cell">
+                    <div className="property-title">{payment.property_title || `Property #${payment.property_id || 'Unknown'}`}</div>
                     {payment.property_address && (
                       <div className="property-address">{payment.property_address}</div>
                     )}
                   </td>
                   <td className="amount">
-                    {payment.currency || '$'} {parseFloat(payment.amount || 0).toLocaleString()}
+                    {payment.currency || 'INR'} {parseFloat(payment.amount || 0).toLocaleString()}
                   </td>
-                  <td>
+                  <td className="status-cell">
                     {isValidPayment(payment.created_at) ? (
                       <span className="status valid">
                         Active
@@ -393,7 +232,7 @@ const PaymentHistory = () => {
           </table>
           
           <div className="history-note">
-            <p>Note: Payments are valid for 30 days. Payment history is maintained for the last 30 days.</p>
+            <p>Note: Payments are valid for 30 days.</p>
           </div>
         </div>
       )}

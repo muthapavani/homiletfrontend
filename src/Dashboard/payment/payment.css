@@ -330,6 +330,14 @@
   border-radius: 10px;
   font-weight: bold;
 }
+  .payment-button.sold-out {
+    background-color: #ccc;
+    color: #555;
+    cursor: not-allowed;
+    font-weight: bold;
+    border: 1px solid #aaa;
+  }
+
 
 
 /* Responsive adjustments */

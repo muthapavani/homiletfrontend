@@ -15,6 +15,7 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
   
   // Configuration
   const token = localStorage.getItem('token');
+  const userid = localStorage.getItem('id');
   console.log(token)
   const API_BASE_URL = "https://homilet-backend-2.onrender.com";
   
@@ -32,11 +33,11 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
         setPaymentStatus({ status: 'unpaid', details: null });
         return;
       }
-      
+  
       try {
         console.log("Checking payment status for property:", propertyId);
         console.log("Token status:", token ? "Token exists" : "No token");
-        
+  
         const response = await fetch(
           `${API_BASE_URL}/api/payments/check-status?propertyId=${propertyId}`, 
           {
@@ -47,16 +48,16 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
             credentials: 'include'
           }
         );
-        
+  
         console.log("Status check response:", response.status);
-        
+  
         if (!response.ok) {
           throw new Error(`Status check failed: ${response.status}`);
         }
-        
+  
         const data = await response.json();
         console.log("Payment status data:", data);
-        
+        console.log("Payment Info:", data.paymentInfo);
         if (data.success) {
           setPaymentStatus({
             status: data.paymentStatus,
@@ -71,12 +72,18 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
         setPaymentStatus({ status: 'error', details: error.message });
       }
     };
-    
+  
     checkPaymentStatus();
     const intervalId = setInterval(checkPaymentStatus, 300000); // 5 minutes
-    return () => clearInterval(intervalId);
-  }, [propertyId, isLoggedIn, token, API_BASE_URL]);
   
+    // Cleanup the interval on unmount
+    return () => clearInterval(intervalId);
+  
+  }, [propertyId, isLoggedIn, token, API_BASE_URL]);
+  // Log the updated payment status
+useEffect(() => {
+  console.log("Payment Status Updated:", paymentStatus);
+}, [paymentStatus]);
   // Fetch payment history with better error handling
   const fetchPaymentHistory = async () => {
     if (!isLoggedIn || !token) {
@@ -515,58 +522,71 @@ const handlePayment = async () => {
     setLoading(false);
   }
 };
+console.log(paymentStatus.user_id != userid)
+const renderPaymentButton = () => {
+ // Find if the user has already paid for this property
+//  const isSoldOut = paymentStatus?.details ? paymentStatus.details.isSoldOut : false;
+ console.log('paymentStatus:', paymentStatus);
+ 
 
-  // Render payment button based on status
-  const renderPaymentButton = () => {
-    if (paymentStatus.status === 'checking') {
-      return (
-        <button className="payment-button loading" disabled={true}>
-          <span className="loading-indicator">Checking status...</span>
-        </button>
-      );
-    }
-    
-    if (paymentStatus.status === 'paid') {
-      return (
-        <button className="payment-button completed" disabled={true}>
-          <span>
-            Payment Completed
-            {paymentStatus.details?.expiresIn && (
-              <small className="expiry-notice"> (Valid for {paymentStatus.details.expiresIn} days)</small>
-            )}
-          </span>
-        </button>
-      );
-    }
-    
-    if (paymentStatus.status === 'expired') {
-      return (
-        <button 
-          onClick={handlePayment}
-          className={`payment-button renewal ${loading ? 'loading' : ''}`}
-          disabled={loading || !isLoggedIn}
-        >
-          {loading 
-            ? <span className="loading-indicator">Processing...</span>
-            : <span>Renew Now ₹{price?.toLocaleString()}</span>
-          }
-        </button>
-      );
-    }
-    
+  if (paymentStatus.status === 'paid' && paymentStatus.details.user_id == userid) {
+    return (
+      <button className="payment-button sold-out" disabled>
+        <span>Sold Out</span>
+      </button>
+    );
+  }
+
+  if (paymentStatus.status === 'checking') {
+    return (
+      <button className="payment-button loading" disabled>
+        <span className="loading-indicator">Checking status...</span>
+      </button>
+    );
+  }
+
+  if (paymentStatus.status === 'paid') {
+    return (
+      <button className="payment-button completed" disabled>
+        <span>
+          Payment Completed
+          {paymentStatus.details?.expiresIn && (
+            <small className="expiry-notice"> (Valid for {paymentStatus.details.expiresIn} days)</small>
+          )}
+        </span>
+      </button>
+    );
+  }
+
+  if (paymentStatus.status === 'expired') {
     return (
       <button 
         onClick={handlePayment}
-        className={`payment-button ${loading ? 'loading' : ''}`}
+        className={`payment-button renewal ${loading ? 'loading' : ''}`}
         disabled={loading || !isLoggedIn}
       >
         {loading 
           ? <span className="loading-indicator">Processing...</span>
-          : <span>Pay Now ₹{price?.toLocaleString()}</span>
+          : <span>Renew Now ₹{price?.toLocaleString()}</span>
         }
       </button>
     );
-  };
+  }
+
+  return (
+    <button 
+      onClick={handlePayment}
+      className={`payment-button ${loading ? 'loading' : ''}`}
+      disabled={loading || !isLoggedIn}
+    >
+      {loading 
+        ? <span className="loading-indicator">Processing...</span>
+        : <span>Pay Now ₹{price?.toLocaleString()}</span>
+      }
+    </button>
+  );
+};
+
 
   // Render payment history
   const renderPaymentHistory = () => {
