@@ -14,7 +14,7 @@ const PaymentHistory = () => {
   
   useEffect(() => {
     fetchPaymentHistory();
-  }, [token]);
+  }, []);
   
   // Fetch payment history from the backend
   const fetchPaymentHistory = async () => {
@@ -28,26 +28,36 @@ const PaymentHistory = () => {
     setError(null);
     
     try {
+      const cleanToken = token.replace(/"/g, '').trim();
+      console.log("Fetching payment history...");
+      
       const response = await fetch(`${API_BASE_URL}/api/payments/history`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token.trim()}`,
-          'Accept': 'application/json'
-        },
-        credentials: 'include'
+          'Authorization': `Bearer ${cleanToken}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
       });
+      
+      console.log("Response status:", response.status);
+      
+      const data = await response.json();
+      console.log("Response data:", data);
       
       if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
           throw new Error("Session expired. Please log in again.");
         } else {
-          throw new Error(`Server error (${response.status}). Please try again later.`);
+          throw new Error(`Server error (${response.status}): ${data.message || 'Unknown error'}`);
         }
       }
       
-      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || "Server returned an error");
+      }
       
-      if (!data.success || !data.history) {
+      if (!data.history || !Array.isArray(data.history)) {
         throw new Error("Invalid response format from server");
       }
       
@@ -73,7 +83,7 @@ const PaymentHistory = () => {
         const dateB = new Date(b.created_at);
         return order === 'asc' ? dateA - dateB : dateB - dateA;
       } else if (field === 'amount') {
-        return order === 'asc' ? a.amount - b.amount : b.amount - a.amount;
+        return order === 'asc' ? parseFloat(a.amount) - parseFloat(b.amount) : parseFloat(b.amount) - parseFloat(a.amount);
       } else if (field === 'property') {
         const propA = (a.property_title || '').toLowerCase();
         const propB = (b.property_title || '').toLowerCase();
@@ -172,7 +182,7 @@ const PaymentHistory = () => {
       
       {error && (
         <div className="error-message">
-          <p><strong>Note:</strong> {error}</p>
+          <p><strong>Error:</strong> {error}</p>
           <button onClick={handleRetry} className="retry-button">
             Retry
           </button>
@@ -182,6 +192,9 @@ const PaymentHistory = () => {
       {!loading && history.length === 0 && !error && (
         <div className="empty-history">
           <p>No payment records found.</p>
+          <button onClick={handleRetry} className="retry-button">
+            Refresh
+          </button>
         </div>
       )}
       
