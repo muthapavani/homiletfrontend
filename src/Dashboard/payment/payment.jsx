@@ -14,7 +14,7 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
   const [historyError, setHistoryError] = useState(null);
   
   // Configuration
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token')?.trim();
   const currentUserId = localStorage.getItem('id');
   const API_BASE_URL = "https://homilet-backend-2.onrender.com";
 
@@ -23,92 +23,93 @@ const PaymentButton = ({ propertyId, propertyTitle, price, isLoggedIn, onLoginRe
     console.log(`[DEBUG] ${message}:`, data);
   };
 
-// Check payment status for this property
-useEffect(() => {
-  const checkPaymentStatus = async () => {
-    if (!isLoggedIn || !token || !propertyId) {
-      setPaymentStatus({ 
-        status: 'unpaid', 
-        details: null,
-        isPaid: false,
-        isCurrentUserPayer: false 
+  // Check payment status for this property
+  useEffect(() => {
+    const checkPaymentStatus = async () => {
+      debug("Starting payment status check with:", {
+        isLoggedIn,
+        hasToken: !!token,
+        propertyId,
+        currentUserId
       });
-      return;
-    }
-
-    try {
-      debug("Checking payment status for property", propertyId);
-      debug("Current user ID", currentUserId);
-      debug("Token status", token ? "Token exists" : "No token");
-
-      const response = await fetch(
-        `${API_BASE_URL}/api/payments/check-status?propertyId=${propertyId}`, 
-        {
-          headers: { 
-            'Authorization': `Bearer ${token.trim()}`,
-            'Accept': 'application/json'
-          },
-          credentials: 'include'
-        }
-      );
-
-      debug("Status check response code", response.status);
-
-      if (!response.ok) {
-        throw new Error(`Status check failed: ${response.status}`);
+      
+      if (!isLoggedIn || !token || !propertyId) {
+        debug("Skipping API call - missing required data", {
+          isLoggedIn,
+          hasToken: !!token,
+          propertyId
+        });
+        setPaymentStatus({ 
+          status: 'unpaid', 
+          details: null,
+          isPaid: false,
+          isCurrentUserPayer: false 
+        });
+        return;
       }
 
-      const data = await response.json();
-      debug("Payment status API response", data);
-      
-      if (data.success) {
-        // Extract payment user ID (the person who made the payment) - check all possible field names
-        const payerUserId = data.paymentInfo?.user_id || 
-                           data.details?.user_id || 
-                           data.details?.user || 
-                           null;
+      try {
+        debug("Checking payment status for property", propertyId);
+        debug("Current user ID", currentUserId);
+        debug("Token status", token ? "Token exists" : "No token");
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/payments/check-status?propertyId=${propertyId}`, 
+          {
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json'
+            },
+            credentials: 'include'
+          }
+        );
+
+        debug("Status check response code", response.status);
+
+        if (!response.ok) {
+          throw new Error(`Status check failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        debug("Payment status API response", data);
         
-        debug("Payer user ID from API", payerUserId);
-        debug("Current user ID from localStorage", currentUserId);
-        
-        // Make sure we're comparing strings for reliable equality check
-        const isCurrentUserThePayer = String(payerUserId) === String(currentUserId);
-        debug("Is current user the payer?", isCurrentUserThePayer ? "Yes" : "No");
-        
-        // Update payment status with clear information
-        setPaymentStatus({
-          status: data.status,
-          isPaid: data.status === 'paid',
-          isCurrentUserPayer: isCurrentUserThePayer,
-          details: data.details || data.paymentInfo || null,
-          payerUserId: payerUserId,
-          daysSincePayment: data.daysSincePayment
-        });
-      } else {
+        if (data.success) {
+          // Use the properties directly from the API response
+          // This ensures we're using the server's determination of payment status
+          setPaymentStatus({
+            status: data.status,
+            isPaid: data.isPaid,
+            isCurrentUserPayer: data.isCurrentUserPayer,
+            details: data.details || null,
+            payerUserId: data.payerUserId,
+            daysSincePayment: data.daysSincePayment
+          });
+        } else {
+          setPaymentStatus({ 
+            status: 'error', 
+            details: data.message,
+            isPaid: false,
+            isCurrentUserPayer: false
+          });
+        }
+      } catch (error) {
+        console.error('Failed to check payment status:', error);
         setPaymentStatus({ 
           status: 'error', 
-          details: data.message,
+          details: error.message,
           isPaid: false,
           isCurrentUserPayer: false
         });
       }
-    } catch (error) {
-      console.error('Failed to check payment status:', error);
-      setPaymentStatus({ 
-        status: 'error', 
-        details: error.message,
-        isPaid: false,
-        isCurrentUserPayer: false
-      });
-    }
-  };
-  checkPaymentStatus();
-  const intervalId = setInterval(checkPaymentStatus, 300000); // 5 minutes
+    };
+    
+    checkPaymentStatus();
+    const intervalId = setInterval(checkPaymentStatus, 300000); // 5 minutes
 
-  // Cleanup the interval on unmount
-  return () => clearInterval(intervalId);
+    // Cleanup the interval on unmount
+    return () => clearInterval(intervalId);
 
-}, [propertyId, isLoggedIn, token, API_BASE_URL, currentUserId]);
+  }, [propertyId, isLoggedIn, token, API_BASE_URL, currentUserId]);
 
   // Log the updated payment status
   useEffect(() => {
@@ -131,7 +132,7 @@ useEffect(() => {
         response = await fetch(`${API_BASE_URL}/api/payments/history`, {
           method: 'GET',
           headers: { 
-            'Authorization': `Bearer ${token.trim()}`,
+            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
             'Origin': window.location.origin
           },
@@ -301,7 +302,7 @@ useEffect(() => {
     }
     
     if (!token) {
-      setError("Authentication required. Please log in again.");
+      // Don't show authentication errors in the UI
       onLoginRedirect();
       return;
     }
@@ -313,7 +314,10 @@ useEffect(() => {
       // Enhanced price validation
       const priceValidation = validatePrice(price);
       if (!priceValidation.valid) {
-        throw new Error(priceValidation.message);
+        // Silently handle price validation error
+        console.error(priceValidation.message);
+        setLoading(false);
+        return;
       }
       
       const validatedPrice = priceValidation.value;
@@ -327,7 +331,10 @@ useEffect(() => {
       
       const scriptLoaded = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
       if (!scriptLoaded) {
-        throw new Error('Failed to load payment gateway.');
+        // Silently handle script loading error
+        console.error('Failed to load payment gateway.');
+        setLoading(false);
+        return;
       }
       
       debug("Creating payment order", null);
@@ -336,7 +343,7 @@ useEffect(() => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.trim()}`,
+          'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
           'Origin': window.location.origin
         },
@@ -358,7 +365,9 @@ useEffect(() => {
         debug("Response data", data);
       } catch (parseError) {
         console.error("JSON parse error:", parseError);
-        throw new Error("Invalid response format from server");
+        // Silently handle parse error
+        setLoading(false);
+        return;
       }
 
       // Handle error responses
@@ -368,16 +377,50 @@ useEffect(() => {
           console.error("Authentication error - logging out");
           localStorage.removeItem('token');
           onLoginRedirect();
-          throw new Error(`Your session has expired. Please log in again.`);
+          // Don't set error state
+          setLoading(false);
+          return;
         }
         
-        // For all other errors
-        throw new Error(data.message || "Payment processing failed. Please try again.");
+        // Handle property already paid logic
+        if (response.status === 400 && data.message === 'Property already paid for') {
+          // Update our payment status to match server state
+          if (data.paymentInfo) {
+            const payerUserId = data.paymentInfo.userId;
+            const isCurrentUserPayer = String(payerUserId) === String(currentUserId);
+            
+            // Immediately update UI with the correct status
+            setPaymentStatus({
+              status: 'paid',
+              isPaid: true,
+              isCurrentUserPayer: isCurrentUserPayer,
+              payerUserId: payerUserId,
+              details: {
+                orderId: data.paymentInfo.orderId,
+                expiresIn: data.paymentInfo.expiresIn || 30,
+                date: data.paymentInfo.date,
+                isSoldOut: !isCurrentUserPayer
+              }
+            });
+          }
+          
+          // Don't set error for "Property already paid for"
+          setLoading(false);
+          return;
+        }
+        
+        // For all other errors, just log them without showing in UI
+        console.error(data.message || "Payment processing failed");
+        setLoading(false);
+        return;
       }
 
       // Check for valid order data
       if (!data.success || !data.order || !data.order.id) {
-        throw new Error(data.message || "Failed to create payment order");
+        // Silently handle missing order data
+        console.error(data.message || "Failed to create payment order");
+        setLoading(false);
+        return;
       }
 
       const orderDetails = data.order;
@@ -403,7 +446,7 @@ useEffect(() => {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token.trim()}`,
+                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Origin': window.location.origin
               },
@@ -424,7 +467,8 @@ useEffect(() => {
               debug("Verify response data", verifyData);
             } catch (e) {
               console.error("Failed to parse verification response:", e);
-              throw new Error("Invalid verification response");
+              setLoading(false);
+              return;
             }
             
             // Handle verification response
@@ -433,11 +477,14 @@ useEffect(() => {
               if (verifyResponse.status === 401) {
                 localStorage.removeItem('token');
                 onLoginRedirect();
-                throw new Error('Session expired during payment verification');
+                setLoading(false);
+                return;
               }
               
-              // For other errors
-              throw new Error(`Payment verification failed: ${verifyData.message || 'Please try again.'}`);
+              // For other errors, silently log them
+              console.error(`Payment verification failed: ${verifyData.message || 'Please try again.'}`);
+              setLoading(false);
+              return;
             }
             
             // Normal success flow
@@ -461,14 +508,17 @@ useEffect(() => {
               if (showHistory) {
                 fetchPaymentHistory();
               }
+              
+              // For successful payments only, show success message
               setError('Payment completed successfully!');
               setTimeout(() => setError(null), 5000);
             } else {
-              setError('Payment verification failed: ' + verifyData.message);
+              // Don't show verification failure message
+              console.error('Payment verification failed: ' + verifyData.message);
             }
           } catch (error) {
             console.error("Verification error:", error);
-            setError(error.message);
+            // Don't set error state
           } finally {
             setLoading(false);
           }
@@ -500,9 +550,7 @@ useEffect(() => {
       
     } catch (error) {
       console.error("Payment error details:", error);
-      
-      // Show clear error message
-      setError(error.message || 'Payment initiation failed');
+      // Don't set error state
       setLoading(false);
     }
   };
@@ -512,28 +560,11 @@ useEffect(() => {
     debug('Rendering payment button with status', paymentStatus);
     debug('Current user ID', currentUserId);
     
-    // Extract payer user ID from all possible locations in the response
-    const payerUserId = 
-      paymentStatus.details?.user_id || // Check details.user_id first
-      paymentStatus.details?.user ||    // Check details.user (from backend code)
-      paymentStatus.payerUserId ||      // Check directly set payerUserId
-      null;                             // Default to null if not found
-    
-    debug('Payer user ID (extracted)', payerUserId);
-    
-    // Make sure we're comparing strings, not different types
-    const currentUserIdStr = String(currentUserId || '');
-    const payerUserIdStr = payerUserId ? String(payerUserId) : '';
-    
-    // Determine if current user is the payer by direct comparison
-    const isCurrentUserPayer = currentUserIdStr === payerUserIdStr;
-    
-    debug('Current user ID (string)', currentUserIdStr);
-    debug('Payer user ID (string)', payerUserIdStr);
-    debug('Is current user the payer (calculated)', isCurrentUserPayer);
-    
-    // Add fallback logic for corrupted state
-    const isPaid = paymentStatus.status === 'paid' || paymentStatus.isPaid === true;
+    // Extract payment status details directly from the payment status object
+    // Use the explicit flags from the backend instead of deriving them
+    const isPaid = paymentStatus.isPaid === true;
+    const isExpired = paymentStatus.status === 'expired';
+    const isCurrentUserPayer = paymentStatus.isCurrentUserPayer === true;
     
     // Show loading indicator while checking status
     if (paymentStatus.status === 'checking') {
@@ -544,7 +575,7 @@ useEffect(() => {
       );
     }
     
-    // Check if property is paid
+    // Property is paid for and valid
     if (isPaid) {
       // If current user is the payer - show Payment Completed with days remaining
       if (isCurrentUserPayer) {
@@ -561,7 +592,7 @@ useEffect(() => {
           </button>
         );
       } 
-      // If someone else paid - show Sold Out
+      // If property is paid and current user is NOT the payer - show Sold Out
       else {
         return (
           <button className="payment-button sold-out" disabled>
@@ -572,7 +603,7 @@ useEffect(() => {
     }
     
     // Payment expired, show renewal button
-    if (paymentStatus.status === 'expired') {
+    if (isExpired) {
       return (
         <button 
           onClick={handlePayment}
@@ -691,9 +722,10 @@ useEffect(() => {
     <div className="payment-button-container">      
       {renderPaymentButton()}
       
-      {error && (
-        <div className={`payment-error ${error.includes('successfully') ? 'success' : ''}`}>
-          <strong>{error.includes('successfully') ? 'Success:' : 'Error:'}</strong> {error}
+      {/* Only show success messages in the error UI */}
+      {error && error.includes('successfully') && (
+        <div className="payment-error success">
+          <strong>Success:</strong> {error}
           <button onClick={() => setError(null)} className="clear-error-button">
             Clear
           </button>
